@@ -391,7 +391,10 @@ function _renderLocalShelf(shelf, rh) {
   for (const [gid, g] of groups) items.push({ type: 'folder', time: groupMaxTime(g), gid, g: { name: g.name, books: g.books }, isLocal: true });
   items.sort((a, b) => b.time - a.time);
   if (getDebugLog()) {
-    for (const b of ungrouped) console.log('[书架调试]', b.name||b.bookId, '| 阅读时间:', new Date(itemTime(b)*1000).toLocaleString(), '| 添加时间:', new Date((b.addedAt||0)*1000).toLocaleString());
+    for (const item of items) if (item.type === 'book') {
+      const b = item.data;
+      console.log('[书架调试]', b.name||b.bookId, '| 阅读时间:', new Date(item.time*1000).toLocaleString(), '| 添加时间:', new Date((b.addedAt||0)*1000).toLocaleString());
+    }
   }
 
   let html = '<div class="shelf-grid">';
@@ -473,7 +476,7 @@ function _renderCloudShelf(rh) {
     groups.get(gid).books.push(b);
   }
   const sortMode = getShelfSort();
-  const itemTime = b => sortMode === 'added' ? (b.AddTime || 0) : (b.LastReadTime || 0);
+  const itemTime = b => sortMode === 'added' ? (b.AddTime || 0) : (b.LastReadTime || b.AddTime || 0);
   const groupMaxTime = g => Math.max(...g.books.map(itemTime));
   const items = [];
   for (const b of ungrouped) items.push({ type: 'book', time: itemTime(b), data: b });
