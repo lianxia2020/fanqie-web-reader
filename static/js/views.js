@@ -473,14 +473,17 @@ function _renderCloudShelf(rh) {
     groups.get(gid).books.push(b);
   }
   const sortMode = getShelfSort();
-  const itemTime = b => sortMode === 'added' ? (b.AddTime || 0) : Math.max(b.LastReadTime || 0, b.LastUpdateTime || 0);
+  const itemTime = b => sortMode === 'added' ? (b.AddTime || 0) : (b.LastReadTime || 0);
   const groupMaxTime = g => Math.max(...g.books.map(itemTime));
   const items = [];
   for (const b of ungrouped) items.push({ type: 'book', time: itemTime(b), data: b });
   for (const [gid, g] of groups) items.push({ type: 'folder', time: groupMaxTime(g), gid, g });
   items.sort((a, b) => b.time - a.time);
   if (getDebugLog()) {
-    for (const b of ungrouped) console.log('[书架调试]', b.Name||b.BookID, '| 阅读时间:', new Date((b.LastReadTime||0)*1000).toLocaleString(), '| 添加时间:', new Date((b.AddTime||0)*1000).toLocaleString());
+    for (const item of items) if (item.type === 'book') {
+      const b = item.data;
+      console.log('[书架调试]', b.Name||b.BookID, '| 阅读时间:', new Date(item.time*1000).toLocaleString(), '| 添加时间:', new Date((b.AddTime||0)*1000).toLocaleString());
+    }
   }
   html += '<div class="shelf-grid">';
   for (const item of items) {
