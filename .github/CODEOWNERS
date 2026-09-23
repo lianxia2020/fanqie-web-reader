@@ -1,0 +1,7 @@
+# Default reviewer for application and workflow changes.
+* @momijineko
+
+# Keep deployment and runtime changes visible to the repository owner.
+/.github/workflows/ @momijineko
+/routers/ @momijineko
+/static/ @momijineko
