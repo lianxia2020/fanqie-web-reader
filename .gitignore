@@ -5,6 +5,8 @@ target/
 .codely-cli/
 nul
 test_*
+!tests/
+!tests/*.py
 decoded_output.txt
 test_font_dl.woff2
 .playwright-cli/
