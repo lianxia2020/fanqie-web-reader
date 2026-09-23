@@ -380,10 +380,12 @@ function _renderLocalShelf(shelf, rh) {
   }
   const sortMode = getShelfSort();
   const itemTime = b => {
-    if (sortMode === 'added') return b.addedAt || 0;
-    const rh = loadData().readingHistory;
-    if (rh && String(rh.bookId) === String(b.bookId) && rh.updatedAt) return Math.floor(rh.updatedAt / 1000);
-    return b.addedAt || 0;
+    const addedAt = Number(b.addedAt) || 0;
+    if (sortMode === 'added') return addedAt;
+    const progress = getBookProgress(b.bookId);
+    const progressTime = progress ? Number(progress.updatedAt) || 0 : 0;
+    const historyTime = rh && String(rh.bookId) === String(b.bookId) ? Number(rh.updatedAt) || 0 : 0;
+    return Math.max(progressTime, historyTime, addedAt);
   };
   const groupMaxTime = g => Math.max(...g.books.map(itemTime));
   const items = [];
@@ -393,7 +395,7 @@ function _renderLocalShelf(shelf, rh) {
   if (getDebugLog()) {
     for (const item of items) if (item.type === 'book') {
       const b = item.data;
-      console.log('[书架调试]', b.name||b.bookId, '| 阅读时间:', new Date(item.time*1000).toLocaleString(), '| 添加时间:', new Date((b.addedAt||0)*1000).toLocaleString());
+      console.log('[书架调试]', b.name||b.bookId, '| 阅读时间:', new Date(item.time).toLocaleString(), '| 添加时间:', new Date(b.addedAt||0).toLocaleString());
     }
   }
 

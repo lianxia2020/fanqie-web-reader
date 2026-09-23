@@ -209,11 +209,17 @@ let scrollToolbarOnScroll = null;
 function setupScrollToolbarAutoHide() {
   if (scrollToolbarOnScroll) window.removeEventListener('scroll', scrollToolbarOnScroll);
   scrollState.lastScrollY = window.scrollY;
+  scrollState.ticking = false;
   scrollToolbarOnScroll = function() {
-    const curY = window.scrollY;
-    const tb = $('readerToolbar');
-    if (tb && curY > scrollState.lastScrollY + 5) tb.classList.add('hidden-toolbar');
-    scrollState.lastScrollY = curY;
+    if (scrollState.ticking) return;
+    scrollState.ticking = true;
+    requestAnimationFrame(() => {
+      const curY = window.scrollY;
+      const tb = $('readerToolbar');
+      if (tb && curY > scrollState.lastScrollY + 5) tb.classList.add('hidden-toolbar');
+      scrollState.lastScrollY = curY;
+      scrollState.ticking = false;
+    });
   };
   window.addEventListener('scroll', scrollToolbarOnScroll, { passive: true });
 }
